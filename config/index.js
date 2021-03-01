@@ -7,14 +7,15 @@ const path = require('path')
 module.exports = {
   dev: {
 
-    // Paths
+    // Paths 告诉浏览器没有跨域（配置代理）
+    // 拦截请求，然后通过代理转发到目标地址
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/api': {
-        target: 'http://localhost:4000',
-        changeOrigin: true,
-        pathRewrite: {
+      '/api': { // 匹配所有以‘/api’开头的请求路径
+        target: 'http://localhost:4000', // 代理目标的基础路径
+        changeOrigin: true, // 支持跨域
+        pathRewrite: { // 重写路径：去掉路径中开头的‘/api’
           '^/api': '/'
         }
       }
@@ -23,7 +24,7 @@ module.exports = {
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
     port: 8081, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
-    autoOpenBrowser: true,
+    autoOpenBrowser: true, // 是否自动打开浏览器
     errorOverlay: true,
     notifyOnErrors: true,
     poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-

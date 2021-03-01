@@ -2,6 +2,7 @@
   <div class="shop-wrapper">
     <div class="shop-content">
       <shop-header/>
+
       <div class="tab">
         <div class="tab-item">
           <router-link to="/shop/goods" replace>点餐</router-link>
@@ -13,7 +14,9 @@
           <router-link to="/shop/info" replace>商家</router-link>
         </div>
       </div>
+
       <router-view/>
+
     </div>
   </div>
 

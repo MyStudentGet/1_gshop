@@ -11,7 +11,7 @@ import {
   reqShopInfo,
   reqSearchGoods,
   reqLogout
-} from '../api'
+} from '../api' // 引入发送ajax请求的接口
 
 import {
   RECEIVE_ADDRESS,
@@ -26,13 +26,16 @@ import {
   INCRMENT_FOOD_COUNT,
   DECRMENT_FOOD_COUNT,
   CLEAR_CART,
-} from './mutation-types'
+} from './mutation-types' // 引入定义好的变量
 
 export default {
   // 异步获取地址
-  async getAddress({commit, state}) {
+  async getAddress({commit, state}) { // async异步：这个AJAX代码运行中的时候其他代码一样可以运行
+    // 把经纬度通过“，”连接起来（reqAddress方法需要这个参数）
     const geohash = state.latitude + ',' + state.longitude
+    // 调用api里的函数发送异步ajax请求
     const result = await reqAddress(geohash)
+    // 把响应的数据
     commit(RECEIVE_ADDRESS, {address: result.data})
   },
 
@@ -56,12 +59,12 @@ export default {
     commit(RECEIVE_SEARCH_SHOPS, {searchShops: result.data})
   },
 
-  //记录用户信息
+  //同步记录用户信息
   recordUserInfo({commit}, userInfo) {
     commit(RECEIVE_USER_INFO, {userInfo})
   },
 
-  // 异步获取用户信息
+  // 异步获取用户信息（自动登录）
   async getUserInfo({commit}) {
     const result = await reqUser()
     if(result.code===0) {
@@ -69,10 +72,11 @@ export default {
     }
   },
 
+  // 异步登出
   async logout({commit}) {
     const result = await reqLogout()
     if(result.code===0) {
-      commit(RESET_USER_INFO)
+      commit(RESET_USER_INFO) // 重置用户信息
     }
   },
 
@@ -106,7 +110,7 @@ export default {
       const goods = result.data
       commit(RECEIVE_GOODS, {goods})
       // 如果组件中传递了接收消息的回调函数, 数据更新后, 调用回调通知调用的组件
-      cb && cb()
+      cb && cb() // 传过来函数就执行不然就不执行
     }
   },
 

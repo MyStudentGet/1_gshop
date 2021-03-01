@@ -13,9 +13,10 @@
 
 <script>
   export default {
-    props: ['alertText'],
+    props: ['alertText'], // 接受一个标签文本（提示错误信息）
     methods: {
       closeTip() {
+        // 分发自定义事件（事件名：closeTip）
         this.$emit('closeTip')
       }
     }
@@ -25,7 +26,7 @@
 <style lang="stylus" rel="stylesheet/stylus" scoped>
   @import '../../common/stylus/mixins.styl';
 
-  @keyframes tipMove
+  @keyframes tipMove // 动画效果
     0%
       transform: scale(1)
     35%

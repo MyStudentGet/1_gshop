@@ -1,11 +1,13 @@
 <template>
   <div class="shop_container">
     <ul class="shop_list" v-if="shops.length">
+<!--      当shops不等于0时显示（传数据过来就显示）-->
       <router-link class="shop_li border-1px"
                    tag='li'
                    to="/shop"
                    v-for="(item, index) in shops"
                    :key="index">
+<!--       router-link：路由链接（相似于$router.puth('/shop')） -->
         <a>
           <div class="shop_left">
             <img class="shop_img" :src="imgBaseUrl + item.image_path">
@@ -19,7 +21,9 @@
             </section>
             <section class="shop_rating_order">
               <section class="shop_rating_order_left">
+
                 <Star :score="item.rating" :size="24"/>
+
                 <div class="rating_section">
                   {{item.rating}}
                 </div>
@@ -42,6 +46,7 @@
         </a>
       </router-link>
     </ul>
+    <!--      没传数据过来就显示这个列表-->
     <ul v-else>
       <li v-for="item in 10" :key="item">
         <img src="./images/shop_back.svg">
@@ -51,7 +56,7 @@
 </template>
 
 <script>
-  import {mapState} from 'vuex'
+  import {mapState} from 'vuex' // 引入mapState
   import Star from '../Star/Star.vue'
 
   export default {
@@ -63,7 +68,7 @@
     computed: {
       ...mapState(['shops'])
     },
-    components: {
+    components: { // 映射成标签
       Star
     }
   }

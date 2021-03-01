@@ -76,7 +76,7 @@
   .search // 搜索
     width 100%
     height 100%
-    overflow hidden
+    /*overflow hidden*/ // 取消页面滚动
     .search_form
       clearFix()
       margin-top 45px

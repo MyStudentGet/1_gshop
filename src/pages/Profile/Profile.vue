@@ -3,6 +3,7 @@
     <HeaderTop title="我的"/>
     <section class="profile-number">
       <router-link :to="userInfo._id?'/userinfo':'/login'" class="profile-link">
+<!--        判断userInfo里的_id有没有值（用户是否登录），如果已登录就跳转到用户信息界面，如未登录就跳转到登录界面-->
         <div class="profile_image">
           <i class="iconfont icon-person"></i>
         </div>
@@ -99,7 +100,7 @@
 <script>
   import {mapState} from 'vuex'
   import Cookies from 'js-cookie'
-  import {MessageBox} from 'mint-ui'
+  import {MessageBox, Toast} from 'mint-ui'
   import HeaderTop from '../../components/HeaderTop/HeaderTop.vue'
   export default {
     computed: {
@@ -108,8 +109,9 @@
 
     methods: {
       logout () {
-        MessageBox.confirm('确定退出登陆吗?').then(action => {
-          this.$store.dispatch('logout')
+        MessageBox.confirm('确定退出登陆吗?').then(action => { // MessageBox：mint-ui里的功能（提示弹窗(取消或确认)）回调函数有点击确认后和点击取消后（这里只写了一个）
+          this.$store.dispatch('logout') // 调用action重置用户信息
+          Toast('登出成功')
         });
       }
     },

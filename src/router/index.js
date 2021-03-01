@@ -5,15 +5,15 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-import Msite from '../pages/Msite/Msite.vue'
-import Search from '../pages/Search/Search.vue'
-import Order from '../pages/Order/Order.vue'
-import Profile from '../pages/Profile/Profile.vue'
-import Login from '../pages/Login/Login.vue'
-import Shop from '../pages/Shop/Shop.vue'
-import ShopGoods from '../pages/Shop/ShopGoods/ShopGoods.vue'
-import ShopRatings from '../pages/Shop/ShopRatings/ShopRatings.vue'
-import ShopInfo from '../pages/Shop/ShopInfo/ShopInfo.vue'
+import Msite from '../pages/Msite/Msite.vue' // 首页
+import Search from '../pages/Search/Search.vue' // 搜索页
+import Order from '../pages/Order/Order.vue' // 订单
+import Profile from '../pages/Profile/Profile.vue' // 个人中心
+import Login from '../pages/Login/Login.vue' // 登录
+import Shop from '../pages/Shop/Shop.vue' // 商品页
+import ShopGoods from '../pages/Shop/ShopGoods/ShopGoods.vue' // 点餐（子路由）
+import ShopRatings from '../pages/Shop/ShopRatings/ShopRatings.vue' // 评价（子路由）
+import ShopInfo from '../pages/Shop/ShopInfo/ShopInfo.vue' // 商家（子路由）
 
 // 声明使用插件
 Vue.use(VueRouter)
@@ -28,7 +28,7 @@ export default new VueRouter({
     {
       path: '/msite',
       component: Msite,
-      meta: { // 给路由添加一个属性（后面会用他做判断，通过$route就可以得到）
+      meta: { // 给路由添加一个属性（后面会用他做判断是否显示组件，通过$route就可以得到）
         showFooter: true
       }
     },
@@ -74,7 +74,7 @@ export default new VueRouter({
           component: ShopInfo
         },
         {
-          path: '',
+          path: '', // 默认路由
           redirect: '/shop/goods'
         }
       ]

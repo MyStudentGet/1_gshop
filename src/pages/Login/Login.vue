@@ -6,6 +6,7 @@
         <div class="login_header_title">
           <a href="javascript:;" @click="setLoginWay(true)" :class="{on: loginWay}">短信登录</a>
           <a href="javascript:;" @click="setLoginWay(false)" :class="{on: !loginWay}">密码登录</a>
+<!--          样式的切换和点击事件-->
         </div>
       </div>
       <div class="login_content">
@@ -18,6 +19,7 @@
                       :class="{right_phone_number:rightPhoneNumber}"
                       @click.prevent="getVerifyCode">获取验证码
               </button>
+<!--             @click.prevent：点击任何按钮都是提交表单，但加上.prevent（拦截默认事件）就可以解决 -->
               <button disabled="disabled" class="get_verification" v-else>已发送({{computedTime}}s)</button>
             </section>
             <section class="login_verification">
@@ -40,13 +42,13 @@
                 <div class="switch_button" :class="showPassword ? 'on' : 'off'"
                      @click="changePassWordType">
                   <div class="switch_circle" :class="{right: showPassword}"></div>
-                  <span class="switch_text">{{showPassword?'abc':''}}</span>
+                  <span class="switch_text">{{showPassword?'显示':''}}</span>
                 </div>
 
               </section>
               <section class="login_message">
                 <input type="text" maxlength="11" placeholder="验证码" v-model="captcha">
-                <img ref="captcha" class="get_verification" src="http://localhost:3000/captcha" alt="captcha" @click="getCaptchaCode">
+                <img ref="captcha" class="get_verification" src="http://localhost:4000/captcha" alt="captcha" @click="getCaptchaCode">
               </section>
             </section>
           </div>
@@ -68,21 +70,21 @@
 <script>
   import {mapActions} from 'vuex'
   import {reqCaptchas, sendCode, smsLogin, pwdLogin} from '../../api'
-  import AlertTip from '../../components/AlertTip/AlertTip.vue'
+  import AlertTip from '../../components/AlertTip/AlertTip.vue' // 引入自定义的错误提示框组件
 
   export default {
     data() {
       return {
         loginWay: false, //登录方式，false代表密码登录, true代表短信登陆
         showPassword: false, // 是否显示密码
-        computedTime: 0, //倒数记时
+        computedTime: 0, // 验证码等待倒数记时
         phone: '', //电话号码
         code: '', //短信验证码
         name: '', //用户名
         pwd: '', //密码
-        captcha: '', // 验证码
+        captcha: '', // 图形验证码
         captchaImg: null, //验证码图片
-        showAlert: false, //显示提示组件
+        showAlert: false, //是否显示提示组件
         alertText: null, //提示的内容
       }
     },
@@ -90,7 +92,7 @@
     computed: {
       //判断手机号码
       rightPhoneNumber: function () {
-        return /^1\d{10}$/.test(this.phone)
+        return /^1\d{10}$/.test(this.phone) // 匹配手机号是否匹配正则表达式（是则返回true）
       }
     },
 
@@ -109,39 +111,44 @@
       },
       // 获取图形验证码
       getCaptchaCode() {
-        this.$refs.captcha.src = 'http://localhost:3000/captcha?time='+new Date()
+        this.$refs.captcha.src = 'http://localhost:4000/captcha?time='+new Date()
+        // 重新指定src（路径和原路径相同，但路径不变化不会发请求，所以为他添加一个时间，保证每次点击路径都不一样）
       },
 
       // 获取短信验证码
       async getVerifyCode() {
-        if (this.rightPhoneNumber) {
-          this.computedTime = 30
-          this.intervalId = setInterval(() => {
+        // 防止连续点击使计时加快
+        if (this.rightPhoneNumber) { // 如果当前没有计时
+          this.computedTime = 30 // 发送验证码的等待时间
+          this.intervalId = setInterval(() => { // 启动计时器
             this.computedTime--
-            if (this.computedTime == 0) {
-              clearInterval(this.intervalId)
+            if (this.computedTime == 0) { // 倒计时为0时
+              clearInterval(this.intervalId) // 停止计时
+              this.intervalId = undefined
             }
           }, 1000)
           //发送短信验证码
           let result = await sendCode(this.phone)
           if (result.code===1) {
-            this.showAlert = true
-            this.alertText = result.msg
+            this.setShowAlert(result.msg)
           }
         }
       },
-
+      // 错误信息提示框
+      setShowAlert (alertText) {
+        this.showAlert = true;
+        this.alertText = alertText
+      },
       // 发送登录信息
       async login() {
         // debugger
+        // 短信登录
         if (this.loginWay) {
           if (!this.phone) {
-            this.showAlert = true;
-            this.alertText = '手机号码不正确'
+            this.setShowAlert('手机号码不正确')
             return
           } else if (!(/^\d{6}$/gi.test(this.code))) {
-            this.showAlert = true;
-            this.alertText = '短信验证码不正确'
+            this.setShowAlert('短信验证码不正确')
             return
           }
 
@@ -155,18 +162,15 @@
             }
           }
 
-        } else {
+        } else { // 用户名密码登录
           if (!this.name) {
-            this.showAlert = true
-            this.alertText = '请输入手机号/邮箱/用户名'
+            this.setShowAlert('请输入手机号/邮箱/用户名')
             return
           } else if (!this.pwd) {
-            this.showAlert = true;
-            this.alertText = '请输入密码'
+            this.setShowAlert('请输入密码')
             return
           } else if (!this.captcha) {
-            this.showAlert = true
-            this.alertText = '请输入验证码'
+            this.setShowAlert('请输入验证码')
             return
           }
 
@@ -182,17 +186,17 @@
         }
         //如果返回的值不正确，则弹出提示框，返回的值正确则返回上一页
         if (!this.userInfo._id) {
-          this.showAlert = true
-          this.alertText = this.userInfo.msg
+          this.setShowAlert(this.userInfo.msg)
           if (!this.loginWay) {
             this.getCaptchaCode()
           }
         } else {
+          // this.$store.dispatch('recordUserInfo', this.userInfo)
           this.recordUserInfo(this.userInfo)
           this.$router.back()
         }
       },
-      // 关系提示框
+      // 关闭关系提示框
       closeTip() {
         this.showAlert = false
       }
@@ -265,7 +269,7 @@
                 color #ccc
                 font-size 14px
                 background transparent
-                &.right_phone_number
+                &.right_phone_number // 把获取验证码的颜色从灰色变成黑色
                   color #000
             .login_verification
               position relative
@@ -304,9 +308,9 @@
                   border-radius 50%
                   background #fff
                   box-shadow 0 2px 4px 0 rgba(0, 0, 0, .1)
-                  transition transform .3s
+                  transition transform .3s // 变形过渡
                   &.right
-                    transform translateX(27px)
+                    transform translateX(27px) // 变形
 
             .login_hint
               margin-top 12px

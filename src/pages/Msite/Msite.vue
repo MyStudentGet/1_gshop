@@ -31,6 +31,7 @@
             <!-- Add Pagination -->
             <div class="swiper-pagination"></div>
           </div>
+<!--          没有数据时显示下面的图片-->
           <img src="./images/msite_back.svg" v-else>
         </nav>
         <!--首页附近商家-->
@@ -47,63 +48,61 @@
 </template>
 
 <script>
-  import {mapState} from 'vuex'
-  import BScroll from 'better-scroll'
+  import {mapState} from 'vuex' // 引入mapstate
+  import BScroll from 'better-scroll' //
   import Swiper from 'swiper' // 引入swiper.js（轮播）
   import 'swiper/dist/css/swiper.min.css' // 引入swiper.css
   import HeaderTop from '../../components/HeaderTop/HeaderTop.vue' // 引入固定头部组件
-  import ShopList from '../../components/ShopList/ShopList.vue'
+  import ShopList from '../../components/ShopList/ShopList.vue' // 引入商品列表组件
 
   export default {
 
     data () {
       return {
-        imgBaseUrl: 'https://fuss10.elemecdn.com'
+        imgBaseUrl: 'https://fuss10.elemecdn.com' // 图片基本地址
       }
     },
 
     mounted () {
-      this.$store.dispatch('getCategorys')
-      this.$store.dispatch('getShops')
+      this.$store.dispatch('getCategorys') // 异步获取分类列表
+      this.$store.dispatch('getShops') // 异步获取商家列表
     },
 
     computed: {
-      ...mapState(['address', 'categorys', 'userInfo']),
+      ...mapState(['address', 'categorys', 'userInfo']), // 从state里取出地址信息对象、食品分类数组、用户信息
 
-      categorysArr () {
-        const max = 8
-        const arr = []
-        const {categorys} = this
-        let tempArr = null
+      categorysArr () { // 分类列表页数数量（根据一维数组categorys生成一个二维数组（个数最大是8））
+        const max = 8 // 小数组中的元素个数最大是8
+        const arr = [] // 大数组
+        const {categorys} = this // 获取一维数组
+        let tempArr = null // 小数组
         categorys.forEach((c, index) => {
-          if(!tempArr) {
+          if(!tempArr) { // 如果小数组是空的，将小数组保存到大数组里面去
             tempArr = []
             arr.push(tempArr)
           }
-          if(tempArr.length<max) {
-            tempArr.push(c)
+          if(tempArr.length<max) { // 判断小数组里的数是否小于8
+            tempArr.push(c) // 把数据存到小数组中
           }
-          if(tempArr.length===max) {
-            tempArr = null
+          if(tempArr.length===max) { // 为下一组数据做准备（小数组的数等于8时）
+            tempArr = null // 创建一个新的
           }
         })
 
-        return arr
+        return arr // 返回二维数组
       }
     },
 
-    watch: {
-
-    },
-
-    watch: {
-      categorys(value) {
-        this.$nextTick(() => {
+    watch: { // 监视（界面更新就立即创建swiper对象）
+      categorys(value) { // 数组中有数据了，在异步更新界面之前
+        this.$nextTick(() => { // 一旦完成界面更新，立即调用（vue的实例方法：此条语句要写在数据更新之后）
+          // 创建一个swiper实例对象，来实现轮播
           new Swiper('.swiper-container', {
+            // 如果需要分页器
             pagination: {
               el: '.swiper-pagination',
             },
-            loop: true
+            loop: true // 可以循环轮播
           })
 
           new BScroll('.miste-content-wrapper', {

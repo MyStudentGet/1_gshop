@@ -76,7 +76,7 @@
       "foods": [
         {
           "name": "南瓜粥",
-          "price": 9,
+          "price|1-15": 9,
           "oldPrice": "",
           "description": "甜粥",
           "sellCount": 91,

@@ -1,6 +1,7 @@
 <template>
   <div class="shop-header">
     <nav class="shop-nav" :style="{backgroundImage: `url(${info.bgImg})`}">
+<!--      强制绑定style设置背景图片（info.bgImg：传过来的数据（图片路径））-->
       <a class="back" @click="$router.back()">
         <i class="iconfont icon-arrow_left"></i>
       </a>
@@ -17,7 +18,7 @@
           <i class="content-icon"></i>
         </h2>
         <div class="shop-message">
-          <span class="shop-message-detail">5</span>
+          <span class="shop-message-detail">{{info.score}}</span>
           <span class="shop-message-detail">月售{{info.sellCount}}单</span>
           <span class="shop-message-detail">
             {{info.description}}
@@ -30,8 +31,10 @@
     </div>
 
     <div class="shop-header-discounts" @click="activityShow" v-if="info.supports">
+<!--     初始化时info是个空对象所以下面代码会报错（三层表达式（{{a.b.c}}）会报错，二层不会）（但效果可以出来是因为后面发送ajax获取到了数据），所以需要指定有数据时才显示执行（v-if是直接移除以达到隐藏效果） -->
       <div class="discounts-left">
         <div class="activity" :class="supportClasses[info.supports[0].type]">
+<!--          优惠活动有三种颜色，也就是三种样式，要根据传过来的数据（type（0、1、2））来进行判断（先把三个类名用数组存起来，再根据type来取出相应的类名）-->
             <span class="content-tag">
               <span class="mini-tag">{{info.supports[0].name}}</span>
             </span>
@@ -44,6 +47,7 @@
     </div>
 
     <transition name="fade">
+<!--      transition 使用样式制造过渡效果-->
       <div class="shop-brief-modal" v-show="isShopShow">
         <div class="brief-modal-content">
           <h2 class="content-title">
@@ -119,13 +123,13 @@
 
     data() {
       return {
-        supportClasses: ['activity-green', 'activity-red', 'activity-orange'],
-        isActivityShow: false,
-        isShopShow: false
+        supportClasses: ['activity-green', 'activity-red', 'activity-orange'], // 优惠的三种类名（控制优惠名称颜色）
+        isActivityShow: false, // 是否显示优惠活动
+        isShopShow: false // 是否显示商家信息
       }
     },
 
-    methods: {
+    methods: { // 两个点击切换显示隐藏的方法(点×返回界面也是这个方法)
       shopShow() {
         this.isShopShow = !this.isShopShow
       },
@@ -135,7 +139,7 @@
     },
 
     computed: {
-      ...mapState(['info'])
+      ...mapState(['info']) // 从state里取出info对象
     },
 
     components: {
@@ -334,6 +338,10 @@
       z-index 52
       flex-direction column
       color #333
+      &.fade-enter-active,&.fade-leave-active // 使用vue动画实现淡入淡出
+        transition opacity .5s
+      &.fade-enter,&.fade-leave-to
+        opacity 0
       .brief-modal-cover
         position absolute
         width 100%
@@ -437,8 +445,8 @@
       height 100%
       z-index 99
       &.move-enter-active, &.move-leave-active
-        transition opacity .3s
-      &.move-enter-active, &.move-leave-active
+        transition opacity .5s
+      &.move-enter, &.move-leave-to
         opacity 0
       .activity-sheet-content
         position absolute

@@ -1,6 +1,8 @@
 /*
 ajax请求函数模块
 返回值：promise对象（异步返回的数据是：response.data）
+发送ajax请求会导致跨域问题
+解决方法：配置代理（在config/index.js内配置）
 */
 import axios from 'axios'
 

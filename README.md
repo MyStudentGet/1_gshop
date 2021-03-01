@@ -30,7 +30,7 @@
      FooterGuide的显示/隐藏: 通过路由的meta
      
 # day02
-## 1. 完成功能
+## 1. 完成功能（异步数据）
 	运行后台项目(启动mongodb服务), 使用postman测试后台接口
 	封装ajax: 
 		promise+axios封装ajax请求的函数
@@ -182,5 +182,4 @@
     使用vuex管理购物车状态: shopCart
 
 ## 4. ShopCart组件
-    
     

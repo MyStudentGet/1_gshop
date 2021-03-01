@@ -1,11 +1,13 @@
 <template>
   <div class="goods-wrap">
     <div class="goods">
+<!--      食物分类列表（ref：方便迅速定位到指定位置）-->
       <div class="menu-wrapper" ref="menuWrapper">
         <ul>
           <!--current-->   <!--currentIndex-->
           <li class="menu-item" v-for="(good, index) in goods"
               :key="index" :class="{current: currentIndex===index}" @click="clickMenu(index)">
+<!--            类名确定只是不确定有没有就用这种方法-->
             <span class="text bottom-border-1px">
               <img class="icon" v-if="good.icon" :src="good.icon">
               {{good.name}}
@@ -13,15 +15,19 @@
           </li>
         </ul>
       </div>
+<!--      食物列表-->
       <div class="foods-wrapper" ref="foodsWrapper">
         <ul>
           <li class="food-list food-list-hook" v-for="(good, index) in goods" :key="index">
+<!--            第一层遍历（遍历分类）二维数组-->
             <h1 class="title">{{good.name}}</h1>
             <ul>
               <li class="food-item bottom-border-1px" v-for="(food, index) in good.foods"
                   :key="index" @click="showFood(food)">
+<!--                第二层遍历（遍历分类里面的食物）-->
                 <div class="icon">
                   <img width="57" height="57" :src="food.icon">
+<!--                  food中icon是小图，image是大图-->
                 </div>
                 <div class="content">
                   <h2 class="name">{{food.name}}</h2>
@@ -50,10 +56,10 @@
 </template>
 
 <script>
-  import BScroll from 'better-scroll'
+  import BScroll from 'better-scroll' // 引入第三方库better-scroll UI滑动（屏幕拉动回弹）
   import {mapState} from 'vuex'
 
-  import CartControl from '../../../components/CartControl/CartControl.vue'
+  import CartControl from '../../../components/CartControl/CartControl.vue' //
   import ShopCart from '../../../components/ShopCart/ShopCart.vue'
   import Food from '../../../components/Food/Food.vue'
 
@@ -66,7 +72,7 @@
       }
     },
     mounted() {
-      this.$store.dispatch('getShopGoods', () => {
+      this.$store.dispatch('getShopGoods', () => { // 传了一个数据（箭头函数）
         // 从后台获取的数据已更新到状态中, 但界面还没有更新(界面的更新是异步的)
         /*setTimeout(() => {
           new BScroll(this.$refs.menuWrapper)
@@ -80,57 +86,60 @@
     },
 
     methods: {
+      // 初始化滚动
       _initScroll () {
         // 控制左侧列表滑动的scroll
-        new BScroll(this.$refs.menuWrapper, {
-          click: true  // 分发点击事件
+        new BScroll(this.$refs.menuWrapper, { // new一个better-scroll对象并添加配置（this.$refs.menuWrapper：ref找到元素节点的方法）
+          click: true  // 分发点击事件（better-scroll默认会阻止浏览器的原生click事件，最新版的就不会了，但还是写上比较好）
         })
 
         // 控制右侧列表滑动的scroll
         this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {
           // startY: -100
           probeType: 1, //会在滑动(手指触摸)过程中实时派发scroll事件
-          click: true
+          click: true // 分发点击事件
         })
 
         // 监视右侧列表的滚动
-        this.foodsScroll.on('scroll', (event) => {
+        this.foodsScroll.on('scroll', (event) => { // event（事件对象）里包括x和y   on:绑定事件（事件名称是固定的官方文档可查）
           // 获取滚动的y坐标
-          console.log('scroll', event.y)
-          this.scrollY = Math.abs(event.y)
+          // console.log('scroll', event.y)
+          this.scrollY = Math.abs(event.y) // 获取y的绝对值
         })
 
-        // 监视右侧列表的滚动结束
+        // 监视右侧列表的滚动结束（防止因惯性滑动无法被监听到）
         this.foodsScroll.on('scrollEnd', (event) => {
           // 获取滚动的y坐标
-          console.log('scrollEnd', event.y)
+          // console.log('scrollEnd', event.y)
           this.scrollY = Math.abs(event.y)
         })
       },
 
+      // 找到每一个类别的位置
       _initTops () {
         // 找到所有li
         const lis = this.$refs.foodsWrapper.getElementsByClassName('food-list-hook')
         // 统计top
-        const tops = []
+        const tops = [] // 储存类别位置的数组
         let top = 0
-        tops.push(top)
-        Array.prototype.slice.call(lis).forEach(li => {
-          top += li.clientHeight
-          tops.push(top)
+        tops.push(top) // 放入第一个类别
+        Array.prototype.slice.call(lis).forEach(li => { // 把伪数组lis转换成真数组，然后遍历
+          top += li.clientHeight // clientHeight: 可理解为内部可视区高度，样式的height+上下padding
+          tops.push(top) // 放入下一个类别
         })
         // 更新状态
         this.tops = tops
-        console.log(tops)
+        // console.log(tops)
       },
 
+      // 左侧分类点击事件（右侧滑动到指定位置）
       clickMenu (index) {
         // console.log('clickMenu()')
 
         // 立即更新scrollY, 立即让currentIndex重新计算
         this.scrollY = this.tops[index]
         // 让右侧列表平滑滚动到指定位置
-        this.foodsScroll.scrollTo(0, -this.tops[index], 300)
+        this.foodsScroll.scrollTo(0, -this.tops[index], 300) // scrollTo：滚动到指定位置（x轴坐标，y轴坐标，滚动动画执行的时长）
       },
 
       showFood (food) {
@@ -146,8 +155,8 @@
 
       /*
       1. 分析出相关的数据
-          scrollY: 右侧滑动的y坐标
-          tops: 所有右侧分类li标签的top所组成数组
+          scrollY: 右侧滑动的y坐标（滑动过程中实时在变化）
+          tops: 所有右侧分类li标签的top所组成数组（列表第一次显示后就不再变化）
       2. 分析计算逻辑
           tops = [0, 10, 15, 18, 15]
           scrollY =      14, 17, 20
@@ -155,11 +164,13 @@
           scrollY>=top && scrollY<nextTop
       计算属性什么就会执行?: 相关的数据发生了变化
        */
+      // 计算属性返回下标（scrollY（右侧滑动的y坐标）一旦变化计算属性重新执行）
       currentIndex () {
+        // 得到条件数据
         const {tops, scrollY} = this
         console.log('currentIndex', scrollY)
-        return tops.findIndex((top, index) => {
-          return scrollY>=top && scrollY<tops[index+1]
+        return tops.findIndex((top, index) => { // findIndex() 方法为数组中的每个元素都调用一次函数执行,如符合条件则返回当前元素的下标
+          return scrollY>=top && scrollY<tops[index+1] // scrollY的值要大于或等于当前top并且要小于下一个top
         })
       },
     },
