@@ -13,7 +13,7 @@
   export default {
 
     created () { // created:在模板渲染成html前调用(发送ajax获取数据)
-      // 异步获取address地址
+      // 异步获取地址
       this.$store.dispatch('getAddress')
       // 异步获取登陆用户信息
       this.$store.dispatch('getUserInfo')
